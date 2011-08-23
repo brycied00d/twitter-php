@@ -196,6 +196,19 @@ class Twitter
 
 
 	/**
+	 * Fetch the current rate-limit status
+	 * @return mixed
+	 * @throws TwitterException
+	 */
+	public function ratelimitstatus()
+	{
+		$res = $this->request("account/rate_limit_status", NULL, 'GET');
+		return $res;
+	}
+
+
+
+	/**
 	 * Process HTTP request.
 	 * @param  string  URL or twitter command
 	 * @param  array   data
