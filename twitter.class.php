@@ -196,6 +196,19 @@ class Twitter
 
 
 	/**
+	 * Report a user for spamming
+	 * @return mixed
+	 * @throws TwitterException
+	 */
+	public function report_spam($username)
+	{
+		$res = $this->request("report_spam", array('screen_name' => $username));
+		return $res;
+	}
+
+
+
+	/**
 	 * Fetch the current rate-limit status
 	 * @return mixed
 	 * @throws TwitterException
