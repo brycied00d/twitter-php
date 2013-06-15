@@ -1,6 +1,6 @@
 <?php
 
-require_once dirname(__FILE__) . '/OAuth.php';
+require_once dirname(__FILE__) . '/TwitterOAuth.php';
 
 
 /**
@@ -36,13 +36,13 @@ class Twitter
 	/** @var string */
 	public static $cacheDir;
 
-	/** @var OAuthSignatureMethod */
+	/** @var TwitterOAuthSignatureMethod */
 	private $signatureMethod;
 
-	/** @var OAuthConsumer */
+	/** @var TwitterOAuthConsumer */
 	private $consumer;
 
-	/** @var OAuthConsumer */
+	/** @var TwitterOAuthConsumer */
 	private $token;
 
 
@@ -61,9 +61,9 @@ class Twitter
 			throw new TwitterException('PHP extension CURL is not loaded.');
 		}
 
-		$this->signatureMethod = new OAuthSignatureMethod_HMAC_SHA1();
-		$this->consumer = new OAuthConsumer($consumerKey, $consumerSecret);
-		$this->token = new OAuthConsumer($accessToken, $accessTokenSecret);
+		$this->signatureMethod = new TwitterOAuthSignatureMethod_HMAC_SHA1();
+		$this->consumer = new TwitterOAuthConsumer($consumerKey, $consumerSecret);
+		$this->token = new TwitterOAuthConsumer($accessToken, $accessTokenSecret);
 	}
 
 
@@ -225,7 +225,7 @@ class Twitter
 			$request = 'http://api.twitter.com/1/' . $request;
 		}
 
-		$request = OAuthRequest::from_consumer_and_token($this->consumer, $this->token, $method, $request, $data);
+		$request = TwitterOAuthRequest::from_consumer_and_token($this->consumer, $this->token, $method, $request, $data);
 		$request->sign_request($this->signatureMethod, $this->consumer, $this->token);
 
 		$curl = curl_init();
