@@ -168,6 +168,46 @@ class Twitter
 
 
 	/**
+	 * Follow a user
+	 * @param  string    username to be followed
+	 * @return mixed
+	 * @throws TwitterException
+	 */
+	public function follow($username)
+	{
+		$res = $this->request("friendships/create", 'POST', array('screen_name' => $username));
+		return $res->id ? $res->id : FALSE;
+	}
+
+
+
+	/**
+	 * Report a user for spamming
+	 * @return mixed
+	 * @throws TwitterException
+	 */
+	public function report_spam($username)
+	{
+		$res = $this->request("users/report_spam", 'POST', array('screen_name' => $username));
+		return $res;
+	}
+
+
+
+	/**
+	 * Fetch the current rate-limit status
+	 * @return mixed
+	 * @throws TwitterException
+	 */
+	public function ratelimitstatus()
+	{
+		$res = $this->request("application/rate_limit_status", 'GET', NULL);
+		return $res;
+	}
+
+
+
+	/**
 	 * Process HTTP request.
 	 * @param  string  URL or twitter command
 	 * @param  string  HTTP method GET or POST
