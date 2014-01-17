@@ -141,6 +141,32 @@ class Twitter
 
 
 	/**
+	 * Returns information of a given user by id.
+	 * @param  string name
+	 * @return mixed
+	 * @throws TwitterException
+	 */
+	public function loadUserInfoById($id)
+	{
+		return $this->cachedRequest('users/show', array('user_id' => $id));
+	}
+
+
+
+	/**
+	 * Returns followers of a given user.
+	 * @param  string name
+	 * @return mixed
+	 * @throws TwitterException
+	 */
+	public function loadUserFollowers($user, $count = 5000, $cursor = -1, $cacheExpiry = null)
+	{
+		return $this->cachedRequest('followers/ids', array('screen_name' => $user, 'count' => $count, 'cursor' => $cursor), $cacheExpiry);
+	}
+
+
+
+	/**
 	 * Destroys status.
 	 * @param  int    id of status to be destroyed
 	 * @return mixed
@@ -332,6 +358,11 @@ class Twitter
 		}
 		foreach ($status->entities->user_mentions as $item) {
 			$all[$item->indices[0]] = array("http://twitter.com/$item->screen_name", "@$item->screen_name", $item->indices[1]);
+		}
+		if (isset($status->entities->media)){
+			foreach ($status->entities->media as $item) {
+				$all[$item->indices[0]] = array($item->url, $item->display_url, $item->indices[1]);
+			}
 		}
 
 		krsort($all);
