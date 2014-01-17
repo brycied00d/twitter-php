@@ -11,11 +11,11 @@ require_once dirname(__FILE__) . '/OAuth.php';
  * @license    New BSD License
  * @link       http://phpfashion.com/
  * @see        http://dev.twitter.com/doc
- * @version    3.0
+ * @version    3.2
  */
 class Twitter
 {
-	const API_URL = 'http://api.twitter.com/1.1/';
+	const API_URL = 'https://api.twitter.com/1.1/';
 
 	/**#@+ Timeline {@link Twitter::load()} */
 	const ME = 1;
@@ -69,7 +69,6 @@ class Twitter
 	}
 
 
-
 	/**
 	 * Tests if user credentials are valid.
 	 * @return boolean
@@ -90,7 +89,6 @@ class Twitter
 	}
 
 
-
 	/**
 	 * Sends message to the Twitter.
 	 * @param string   message encoded in UTF-8
@@ -101,7 +99,6 @@ class Twitter
 	{
 		return $this->request('statuses/update', 'POST', array('status' => $message));
 	}
-
 
 
 	/**
@@ -126,7 +123,6 @@ class Twitter
 	}
 
 
-
 	/**
 	 * Returns information of a given user.
 	 * @param  string name
@@ -137,7 +133,6 @@ class Twitter
 	{
 		return $this->cachedRequest('users/show', array('screen_name' => $user));
 	}
-
 
 
 	/**
@@ -152,7 +147,6 @@ class Twitter
 	}
 
 
-
 	/**
 	 * Returns followers of a given user.
 	 * @param  string name
@@ -163,7 +157,6 @@ class Twitter
 	{
 		return $this->cachedRequest('followers/ids', array('screen_name' => $user, 'count' => $count, 'cursor' => $cursor), $cacheExpiry);
 	}
-
 
 
 	/**
@@ -179,7 +172,6 @@ class Twitter
 	}
 
 
-
 	/**
 	 * Returns tweets that match a specified query.
 	 * @param  string|array   query
@@ -190,7 +182,6 @@ class Twitter
 	{
 		return $this->request('search/tweets', 'GET', is_array($query) ? $query : array('q' => $query))->statuses;
 	}
-
 
 
 	/**
@@ -291,7 +282,6 @@ class Twitter
 	}
 
 
-
 	/**
 	 * Cached HTTP request.
 	 * @param  string  URL or twitter command
@@ -328,7 +318,6 @@ class Twitter
 	}
 
 
-
 	/**
 	 * Makes twitter links, @usernames and #hashtags clickable.
 	 * @param  stdClass|string status
@@ -359,7 +348,7 @@ class Twitter
 		foreach ($status->entities->user_mentions as $item) {
 			$all[$item->indices[0]] = array("http://twitter.com/$item->screen_name", "@$item->screen_name", $item->indices[1]);
 		}
-		if (isset($status->entities->media)){
+		if (isset($status->entities->media)) {
 			foreach ($status->entities->media as $item) {
 				$all[$item->indices[0]] = array($item->url, $item->display_url, $item->indices[1]);
 			}
@@ -374,7 +363,6 @@ class Twitter
 		}
 		return $s;
 	}
-
 
 
 	private static function clickableCallback($m)
