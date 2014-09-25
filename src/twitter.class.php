@@ -204,20 +204,6 @@ class Twitter
 
 
 	/**
-	 * Follow a user
-	 * @param  string    username to be followed
-	 * @return mixed
-	 * @throws TwitterException
-	 */
-	public function follow($username)
-	{
-		$res = $this->request("friendships/create", 'POST', array('screen_name' => $username));
-		return $res->id ? $res->id : FALSE;
-	}
-
-
-
-	/**
 	 * Report a user for spamming
 	 * @return mixed
 	 * @throws TwitterException
