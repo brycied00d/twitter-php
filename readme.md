@@ -1,5 +1,7 @@
-[Twitter for PHP](http://phpfashion.com/twitter-for-php)
+[Twitter for PHP](http://phpfashion.com/twitter-for-php)  [![Buy me a coffee](http://files.nette.org/images/coffee1s.png)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=QLFKBFDU6C94L)
 ================================
+
+[![Downloads this Month](https://img.shields.io/packagist/dm/dg/twitter-php.svg)](https://packagist.org/packages/dg/twitter-php)
 
 Twitter for PHP is a very small and easy-to-use library for sending
 messages to Twitter and receiving status updates.
@@ -95,6 +97,10 @@ returns the array of most recent tweets authored by the authenticating user:
 
 Changelog
 ---------
+v3.3 (3/2014)
+- Twitter::send($status, $image) can upload image
+- added Twitter::follow()
+
 v3.2 (1/2014)
 - Twitter API uses SSL OAuth
 - Twitter::clickable() supports media

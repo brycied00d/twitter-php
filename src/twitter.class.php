@@ -11,7 +11,7 @@ require_once dirname(__FILE__) . '/OAuth.php';
  * @license    New BSD License
  * @link       http://phpfashion.com/
  * @see        http://dev.twitter.com/doc
- * @version    3.2
+ * @version    3.3
  */
 class Twitter
 {
@@ -95,9 +95,26 @@ class Twitter
 	 * @return object
 	 * @throws TwitterException
 	 */
-	public function send($message)
+	public function send($message, $media = NULL)
 	{
-		return $this->request('statuses/update', 'POST', array('status' => $message));
+		return $this->request(
+			$media ? 'statuses/update_with_media' : 'statuses/update',
+			'POST',
+			array('status' => $message),
+			$media ? array('media[]' => $media) : NULL
+		);
+	}
+
+
+	/**
+	 * Follows a user on Twitter.
+	 * @param  string  user name
+	 * @return object
+	 * @throws TwitterException
+	 */
+	public function follow($username)
+	{
+		return $this->request('friendships/create', 'POST', array('screen_name' => $username));
 	}
 
 
@@ -175,12 +192,14 @@ class Twitter
 	/**
 	 * Returns tweets that match a specified query.
 	 * @param  string|array   query
+	 * @param  bool  return complete response?
 	 * @return mixed
 	 * @throws TwitterException
 	 */
-	public function search($query)
+	public function search($query, $full = FALSE)
 	{
-		return $this->request('search/tweets', 'GET', is_array($query) ? $query : array('q' => $query))->statuses;
+		$res = $this->request('search/tweets', 'GET', is_array($query) ? $query : array('q' => $query));
+		return $full ? $res : $res->statuses;
 	}
 
 
@@ -229,10 +248,11 @@ class Twitter
 	 * @param  string  URL or twitter command
 	 * @param  string  HTTP method GET or POST
 	 * @param  array   data
+	 * @param  array   uploaded files
 	 * @return mixed
 	 * @throws TwitterException
 	 */
-	public function request($resource, $method, array $data = NULL)
+	public function request($resource, $method, array $data = NULL, array $files = NULL)
 	{
 		if (!strpos($resource, '://')) {
 			if (!strpos($resource, '.')) {
@@ -245,7 +265,14 @@ class Twitter
 			unset($data[$key]);
 		}
 
-		$request = Twitter_OAuthRequest::from_consumer_and_token($this->consumer, $this->token, $method, $resource, $data);
+		foreach ((array) $files as $key => $file) {
+			if (!is_file($file)) {
+				throw new TwitterException("Cannot read the file $file. Check if file exists on disk and check its permissions.");
+			}
+			$data[$key] = '@' . $file;
+		}
+
+		$request = Twitter_OAuthRequest::from_consumer_and_token($this->consumer, $this->token, $method, $resource, $files ? array() : $data);
 		$request->sign_request($this->signatureMethod, $this->consumer, $this->token);
 
 		$options = array(
@@ -253,8 +280,8 @@ class Twitter
 			CURLOPT_RETURNTRANSFER => TRUE,
 		) + ($method === 'POST' ? array(
 			CURLOPT_POST => TRUE,
-			CURLOPT_POSTFIELDS => $request->to_postdata(),
-			CURLOPT_URL => $request->get_normalized_http_url(),
+			CURLOPT_POSTFIELDS => $files ? $data : $request->to_postdata(),
+			CURLOPT_URL => $files ? $request->to_url() : $request->get_normalized_http_url(),
 		) : array(
 			CURLOPT_URL => $request->to_url(),
 		)) + $this->httpOptions;
@@ -298,7 +325,7 @@ class Twitter
 			$cacheExpire = self::$cacheExpire;
 		}
 
-		$cacheFile = self::$cacheDir . '/twitter.' . md5($resource . json_encode($data) . serialize(array($this->consumer, $this->token)));
+		$cacheFile = self::$cacheDir . '/twitter.' . md5($resource . json_encode($data) . serialize(array($this->consumer, $this->token))) . '.json';
 		$cache = @json_decode(@file_get_contents($cacheFile)); // intentionally @
 		if ($cache && @filemtime($cacheFile) + $cacheExpire > time()) { // intentionally @
 			return $cache;
